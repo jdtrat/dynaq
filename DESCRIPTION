@@ -9,3 +9,5 @@ Description: Functions used to simulate DynaQ reinforcement learning (RL) algori
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/jdtrat/dynaq
+BugReports: https://github.com/jdtrat/dynaq/issues
