@@ -1,0 +1,11 @@
+Package: dynaq
+Type: Package
+Title: Tools to Simulate DynaQ Reinforcement Learning Algorithms
+Version: 0.1.0
+Author: Jonathan D. Trattner
+Maintainer: Jonathan D. Trattner <code@jdtrat.com>
+Description: Functions used to simulate DynaQ reinforcement learning (RL) algorithms
+    in a two-stage Markov Decision task common in neuroscientific research (see Daw et al., 2005; Solway et al., 2019).
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
