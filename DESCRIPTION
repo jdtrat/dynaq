@@ -18,4 +18,5 @@ Imports:
     stringr,
     forcats,
     purrr,
-    ggplot2
+    ggplot2,
+    tidyr
