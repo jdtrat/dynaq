@@ -24,10 +24,10 @@ randRewardProb <- function() {
 #'
 #' The four probabilities are initialized as global variables:
 #' \itemize{
-#'     \item probAR
-#'     \item probAL
-#'     \item probBR
-#'     \item probBL
+#'     \item rewardProb$AR
+#'     \item rewardProb$AL
+#'     \item rewardProb$BR
+#'     \item rewardProb$BL
 #' }
 #'
 #' @return Returns the initial reward probabilities for each image
@@ -36,10 +36,10 @@ randRewardProb <- function() {
 setupRewards <- function() {
 
   #create initial reward probabilities for fractals AR, AL, BR, and BL
-  probAR <<- randRewardProb() #initial reward probability from state RAR or LAR
-  probAL <<- randRewardProb() #initial reward probability from state RAL or LAL
-  probBR <<- randRewardProb() #initial reward probability from state RBR or LBR
-  probBL <<- randRewardProb() #initial reward probability from state RBL or LBL
+  rewardProb$AR <- randRewardProb() #initial reward probability from state RAR or LAR
+  rewardProb$AL <- randRewardProb() #initial reward probability from state RAL or LAL
+  rewardProb$BR <- randRewardProb() #initial reward probability from state RBR or LBR
+  rewardProb$BL <- randRewardProb() #initial reward probability from state RBL or LBL
 
 }
 
@@ -118,7 +118,7 @@ updateRewardProb <- function(imageProb){
 #'
 #' @return Binary reward (1 or 0) based off of the relevant state probability.
 #' @export
-#'
+
 getReward <- function(state) {
 
   #For each fractal, add a random value from the gaussian distribution with mean = 0 and sd = 0.025.
@@ -126,23 +126,23 @@ getReward <- function(state) {
   #if a random number is less than or equal to that probability, reward is given (1) else, it's not (0).
 
   if(state == "RAR" | state == "LAR") {
-    probAR <<- updateRewardProb(probAR)
-    if(stats::runif(1) <= probAR){reward <- 1}else{reward <- 0} #assign reward
+    rewardProb$AR <- updateRewardProb(rewardProb$AR)
+    if(stats::runif(1) <= rewardProb$AR){reward <- 1}else{reward <- 0} #assign reward
   }
 
   if(state == "RAL" | state == "LAL") {
-    probAL <<- updateRewardProb(probAL)
-    if(stats::runif(1) <= probAL){reward <- 1}else{reward <- 0} #assign reward
+    rewardProb$AL <- updateRewardProb(rewardProb$AL)
+    if(stats::runif(1) <= rewardProb$AL){reward <- 1}else{reward <- 0} #assign reward
   }
 
   if(state == "RBR" | state == "LBR") {
-    probBR <<- updateRewardProb(probBR)
-    if(stats::runif(1) <= probBR){reward <- 1}else{reward <- 0} #assign reward
+    rewardProb$BR <- updateRewardProb(rewardProb$BR)
+    if(stats::runif(1) <= rewardProb$BR){reward <- 1}else{reward <- 0} #assign reward
   }
 
   if(state == "RBL" | state == "LBL") {
-    probBL <<- updateRewardProb(probBL)
-    if(stats::runif(1) <= probBL){reward <- 1}else{reward <- 0} #assign reward
+    rewardProb$BL <- updateRewardProb(rewardProb$BL)
+    if(stats::runif(1) <= rewardProb$BL){reward <- 1}else{reward <- 0} #assign reward
   }
   return(reward)
 }

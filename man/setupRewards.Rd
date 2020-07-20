@@ -16,9 +16,9 @@ the beginning of a session.
 \details{
 The four probabilities are initialized as global variables:
 \itemize{
-    \item probAR
-    \item probAL
-    \item probBR
-    \item probBL
+    \item rewardProb$AR
+    \item rewardProb$AL
+    \item rewardProb$BR
+    \item rewardProb$BL
 }
 }
