@@ -69,7 +69,7 @@ manipulateData <- function(data) {
                        probBL = probBL, #reward probability for image BL
                        alpha = Alpha, #alpha
                        gamma = Gamma, #gamma
-                       epsilon = epsilon, #epsilon
+                       epsilon = Epsilon, #epsilon
                        tau = Tau, #tau
                        experience = experience,
                        row = row) %>%
@@ -118,7 +118,7 @@ manipulateData <- function(data) {
 
 interleave <- function(x, y, n) {
 
-  if (base::names(x) !=  base::names(y)) {
+  if (all(colnames(x) != colnames(y))) {
     stop("Column names are not equal. Cannot interleave.")
   }
 
@@ -155,14 +155,6 @@ interleave <- function(x, y, n) {
 
   return(combine)
 }
-
-
-# processSimData Function -------------------------------------------------
-# processSimData function takes in the output of generateData if it's not pure model-free
-# and then returns the unlisted version of simulation in order.
-# x is the number of simulations per real trials from generateData.
-# The output of preprocessSimData if removeTable = TRUE can be passed into the stayProbabilityPlot function, for instance.
-# The output of preprocessSimData if removeTable = FALSE can be passed into getPlots, for instance.
 
 #' Process Simulated Data
 #'

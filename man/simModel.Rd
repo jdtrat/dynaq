@@ -22,12 +22,12 @@ experience)}
 total number performed via the \code{\link{updateTransFunction}}.}
 }
 \value{
-A tibble with 8 rows and 16 columns. The 8 rows contain identical
+A tibble with 8 rows and 18 columns. The 8 rows contain identical
   information \strong{except for the Qtable column.} They contain information
   about the states, actions, and rewards for one trial as well as meta data
-  including the temporal discounting factor (gamma) learning rate for
-  simulated data (alpha), and the probability of receiving a reward for each
-  image.
+  including the temporal discounting factor (gamma) learning rate (alpha,
+  specific to simulated experience), choice policy parameters (epsilon and
+  tau), and probability of receiving a reward for each image.
 }
 \description{
 The \code{simModel} function simulates one trial of the two-stage Markov task

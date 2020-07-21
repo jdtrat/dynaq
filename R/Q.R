@@ -1,6 +1,3 @@
-# setupQtable function ----------------------------------------------------
-# setupQtable function simply initializes the Qtable for the beginning of a session.
-
 #' Initialize Q-value Information
 #'
 #' setupQtable initializes the \code{Q$Table}, including the \code{Q$R} and
@@ -55,12 +52,10 @@ updateQRL <- function(state, action, alpha, gamma) {
   if (state == "FC" && action == "right") {
     #update the Q value of going right at state FC
     Q$R <- Q$R + (alpha * (0 + (gamma * base::max(Q$Table[1:4,1]) - Q$R)))
-
   }else if (state == "FC" && action == "left") {
     #update the Q value of going left at state FC
     Q$L <- Q$L + (alpha * (0 + (gamma * base::max(Q$Table[5:8,1]) - Q$L)))
   }
-
 }
 
 
@@ -81,11 +76,14 @@ updateQRL <- function(state, action, alpha, gamma) {
 #'
 updateQsecondState <- function(state, action, alpha, gamma) {
 
-  index <- Q$stateActionPair %>%
-    dplyr::filter(stringr::str_detect(stateName, state) & stringr::str_detect(actionOptions, action)) %>%
-    dplyr::pull(index)
+  if(base::sum(stringr::str_detect(Q$stateActionPair$stateName, base::as.character(state))) != 0) {
+    index <- Q$stateActionPair %>%
+      dplyr::filter(stringr::str_detect(stateName, base::as.character(state)) & stringr::str_detect(actionOptions, base::as.character(action))) %>%
+      dplyr::pull(index)
 
-  Q$Table[index,1] <- Q$Table[index,1] + (alpha * (0 + (gamma * base::max(Q$Table[index,2])) - Q$Table[index,1]))
+    Q$Table[index,1] <- Q$Table[index,1] + (alpha * (0 + (gamma * base::max(Q$Table[index,2])) - Q$Table[index,1]))
+  }
+
 
 }
 
@@ -106,13 +104,17 @@ updateQsecondState <- function(state, action, alpha, gamma) {
 #'
 updateQthirdState <- function(state, reward, alpha, gamma) {
 
-  index <- Q$thirdStateVec %>%
-    dplyr::filter(stringr::str_detect(stateName, state)) %>%
-    dplyr::pull(index)
+  if(base::sum(stringr::str_detect(Q$thirdStateVec$stateName, stringr::str_c(state, "$"))) != 0) {
+    index <- Q$thirdStateVec %>%
+      dplyr::filter(stringr::str_detect(stateName, base::as.character(state))) %>%
+      dplyr::pull(index)
 
-  #Update the Q values according to the Q-learning algorithm. max(0) because
-  #next state is terminal/doesn't exist.
-  Q$Table[index,2] <- Q$Table[index,2] + (alpha * (reward + (gamma * base::max(0)) - Q$Table[index,2]))
+    #Update the Q values according to the Q-learning algorithm. max(0) because
+    #next state is terminal/doesn't exist.
+    Q$Table[index,2] <- Q$Table[index,2] + (alpha * (reward + (gamma * base::max(0)) - Q$Table[index,2]))
+
+  }
+
 }
 
 
@@ -144,6 +146,5 @@ updateQtable <- function(state, action, reward, alpha = 0.1, gamma = 0.9) {
   updateQRL(state = state, action = action, alpha = alpha, gamma = gamma)
   updateQsecondState(state = state, action = action, alpha = alpha, gamma = gamma)
   updateQthirdState(state = state, reward = reward, alpha = alpha, gamma = gamma)
-
 }
 

@@ -1,5 +1,3 @@
-# setupTransFunction -------------------------------------------------
-
 #' Setup Transition Model
 #'
 #' @return Returns the initialized simulation counter \code{trans$numSims}, the

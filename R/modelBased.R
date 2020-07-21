@@ -47,12 +47,12 @@ randomPrevious <- function(df, name) {
 #' @param x The amount of simulations to be done. This is used to track the
 #'   total number performed via the \code{\link{updateTransFunction}}.
 #'
-#' @return A tibble with 8 rows and 16 columns. The 8 rows contain identical
+#' @return A tibble with 8 rows and 18 columns. The 8 rows contain identical
 #'   information \strong{except for the Qtable column.} They contain information
 #'   about the states, actions, and rewards for one trial as well as meta data
-#'   including the temporal discounting factor (gamma) learning rate for
-#'   simulated data (alpha), and the probability of receiving a reward for each
-#'   image.
+#'   including the temporal discounting factor (gamma) learning rate (alpha,
+#'   specific to simulated experience), choice policy parameters (epsilon and
+#'   tau), and probability of receiving a reward for each image.
 #' @export
 #'
 
@@ -96,7 +96,7 @@ simModel <- function(trialData, modelAlpha = 0.1, gam = 0.9, epsilon = 0.1, tau 
   updateQtable(state = state3, action = "none", reward = reward2, alpha = modelAlpha, gamma = gam)
 
   #generate output dataframe
-  output <- tidyr:tibble("State1" = "FC",
+  output <- tidyr::tibble("State1" = "FC",
                          "Action1" = action1,
                          "State2" = state2,
                          "Reward1" = reward1,
@@ -105,6 +105,8 @@ simModel <- function(trialData, modelAlpha = 0.1, gam = 0.9, epsilon = 0.1, tau 
                          "Reward2" = reward2,
                          "Gamma" = gam,
                          "Alpha" = modelAlpha,
+                         "Epsilon" = epsilon,
+                         "Tau" = tau,
                          "probAR" = rewardProb$AR,
                          "probAL" = rewardProb$AL,
                          "probBR" = rewardProb$BR,
@@ -112,8 +114,6 @@ simModel <- function(trialData, modelAlpha = 0.1, gam = 0.9, epsilon = 0.1, tau 
                          "Qtable" = Q$Table,
                          "QL" = Q$L,
                          "QR" = Q$R)
-
-  return(output)
 
 }
 
