@@ -16,12 +16,12 @@ setupTransFunction <- function() {
   trans$numSims <- NULL
 
   #Initialize transition function for transitioning to "states" RA, RB, LA, and LB.
-  trans$Function <- data.frame("tRA" = 0.5,
+  trans$Function <- base::data.frame("tRA" = 0.5,
                                "tRB" = 0.5,
                                "tLA" = 0.5,
                                "tLB" = 0.5)
   #initialize the trans$Table with four different
-  trans$Table <- tibble("State" = NA,
+  trans$Table <- tidyr::tibble("State" = NA,
                         "Action" = NA,
                         "StatePrime" = NA,
                         "Reward" = NA,
@@ -58,33 +58,33 @@ updateTransFunction <- function(action, statePrime, alpha, real = NULL, x) {
   }
 
   #update the real experience as the latest real experience
-  realExp <- tibble(tail(real, 1))
-  names(realExp) <- c("State", "Action", "StatePrime", "Reward")
-  realExp <- realExp %>% mutate("Sim" = 0)
+  realExp <- tidyr::tibble(utils::tail(real, 1))
+  base::names(realExp) <- c("State", "Action", "StatePrime", "Reward")
+  realExp <- realExp %>% dplyr::mutate("Sim" = 0)
 
-  simExp <- tibble("State" = "FC", #initial state is always FC
+  simExp <- tidyr::tibble("State" = "FC", #initial state is always FC
                    "Action" = action,
                    "StatePrime" = statePrime,
                    "Reward" = 0, #there's never a reward presented at statePrime
                    "Sim" = 1)
 
   #if this is the first round, and trans$Table has all NAs from initialization
-  if(sum(is.na(trans$Table)) == 5) {
+  if(base::sum(base::is.na(trans$Table)) == 5) {
     #bind the existing trans$Table (previous real and simulated experience)
     #with the new real experience and the simulated experience
-    trans$Table <- bind_rows(trans$Table,
+    trans$Table <- dplyr::bind_rows(trans$Table,
                              realExp,
-                             simExp) %>% na.omit() #remove the empty trans$Table row when initializing
+                             simExp) %>% stats::na.omit() #remove the empty trans$Table row when initializing
 
     trans$numSims <- 1 #one simulation has been done
 
     #otherwise if this isn't the first round
-  }else if (sum(is.na(trans$Table)) != 5) {
+  }else if (base::sum(base::is.na(trans$Table)) != 5) {
 
     #check if trans$numSims is equal to x. If not, just keep track of the simulated experience and update trans$numSims
     if (trans$numSims != x) {
 
-      trans$Table <- bind_rows(trans$Table, simExp)
+      trans$Table <- dplyr::bind_rows(trans$Table, simExp)
       trans$numSims <- trans$numSims + 1
 
       #If trans$numSims is equal to x then bind the (new) real experience and simulated experience, and reset
@@ -92,7 +92,7 @@ updateTransFunction <- function(action, statePrime, alpha, real = NULL, x) {
     }else if (trans$numSims == x) {
       #bind the existing trans$Table (previous real and simulated experience)
       #with the new real experience and the simulated experience
-      trans$Table <- bind_rows(trans$Table,
+      trans$Table <- dplyr::bind_rows(trans$Table,
                                realExp,
                                simExp)
       trans$numSims <- 1
@@ -100,40 +100,40 @@ updateTransFunction <- function(action, statePrime, alpha, real = NULL, x) {
   }
 
   #trans$Track keeps the running proportion of states observed as a result of the first action/transition
-  trans$Track <- trans$Table %>% mutate(Action = recode(.$Action, "right" = 1, "left" = 0),
-                                       Right = case_when(Action == 1 ~ 1, #if action is 1 (right) make Right = 1, otherwise Right = 0
-                                                         TRUE ~ 0),
-                                       Left = case_when(Action == 0 ~ 1, #if action is 0 (left) make Left = 1, otherwise Left = 0
-                                                        TRUE ~ 0),
+  trans$Track <- trans$Table %>% dplyr::mutate(Action = dplyr::recode(.$Action, "right" = 1, "left" = 0),
+                                               Right = dplyr::case_when(Action == 1 ~ 1, #if action is 1 (right) make Right = 1, otherwise Right = 0
+                                                                        TRUE ~ 0),
+                                               Left = dplyr::case_when(Action == 0 ~ 1, #if action is 0 (left) make Left = 1, otherwise Left = 0
+                                                                       TRUE ~ 0),
 
-                                       #Track the states
-                                       RB = case_when(Right == 1 & StatePrime == "RB" ~ 1,
-                                                      TRUE ~ 0),
-                                       RA = case_when(Right == 1 & StatePrime == "RA" ~ 1,
-                                                      TRUE ~ 0),
-                                       LB = case_when(Left == 1 & StatePrime == "LB" ~ 1,
-                                                      TRUE ~ 0),
-                                       LA = case_when(Left == 1 & StatePrime == "LA" ~ 1,
-                                                      TRUE ~ 0),
-                                       #get the proportion of the states observed
-                                       propRB = cumsum(RB) / cumsum(Right),
-                                       propRA = 1 - propRB,
-                                       propLB = cumsum(LB) / cumsum(Left),
-                                       propLA = 1 - propLB) %>%
+                                               #Track the states
+                                               RB = dplyr::case_when(Right == 1 & StatePrime == "RB" ~ 1,
+                                                                     TRUE ~ 0),
+                                               RA = dplyr::case_when(Right == 1 & StatePrime == "RA" ~ 1,
+                                                                     TRUE ~ 0),
+                                               LB = dplyr::case_when(Left == 1 & StatePrime == "LB" ~ 1,
+                                                                     TRUE ~ 0),
+                                               LA = dplyr::case_when(Left == 1 & StatePrime == "LA" ~ 1,
+                                                                     TRUE ~ 0),
+                                               #get the proportion of the states observed
+                                               propRB = base::cumsum(RB) / base::cumsum(Right),
+                                               propRA = 1 - propRB,
+                                               propLB = base::cumsum(LB) / base::cumsum(Left),
+                                               propLA = 1 - propLB) %>%
     #ensure that the if one of these states hasn't been experienced in the simulation, that
     #the values will be 0 because they haven't been experienced.
-    mutate(propRB = replace_na(propRB, 0),
-           propRA = replace_na(propRA, 0),
-           propLB = replace_na(propLB, 0),
-           propLA = replace_na(propLA, 0))
+    dplyr::mutate(propRB = tidyr::replace_na(propRB, 0),
+                  propRA = tidyr::replace_na(propRA, 0),
+                  propLB = tidyr::replace_na(propLB, 0),
+                  propLA = tidyr::replace_na(propLA, 0))
 
 
   #update the transition function based on the latest cumulative sum of the proportion of going to RB/RA/LB/LA
   #based on going right/left
-  trans$Function <- data.frame("tRA" = last(trans$Track$propRA),
-                               "tRB" = last(trans$Track$propRB),
-                               "tLA" = last(trans$Track$propLA),
-                               "tLB" = last(trans$Track$propLB))
+  trans$Function <- base::data.frame("tRA" = dplyr::last(trans$Track$propRA),
+                               "tRB" = dplyr::last(trans$Track$propRB),
+                               "tLA" = dplyr::last(trans$Track$propLA),
+                               "tLB" = dplyr::last(trans$Track$propLB))
 }
 
 
@@ -186,14 +186,14 @@ updateTransFunction <- function(action, statePrime, alpha, real = NULL, x) {
 getFirstTransition <- function(state, action, sim = FALSE, tFunction = NULL, transDF = NULL) {
   p1 <- stats::runif(1) #set probability for transitioning to next state
   if(!sim) {
-    if (state == state("FC") && action == "right" && p1 <= 0.7) {next_state <- state("RB")}
-    if (state == state("FC") && action == "right" && p1 > 0.7) {next_state <- state("RA")}
-    if (state == state("FC") && action == "left" && p1 <= 0.7) {next_state <- state("LA")}
-    if (state == state("FC") && action == "left" && p1 > 0.7) {next_state <- state("LB")}
+    if (state == "FC" && action == "right" && p1 <= 0.7) {next_state <- "RB"}
+    if (state == "FC" && action == "right" && p1 > 0.7) {next_state <- "RA"}
+    if (state == "FC" && action == "left" && p1 <= 0.7) {next_state <- "LA"}
+    if (state == "FC" && action == "left" && p1 > 0.7) {next_state <- "LB"}
   }
 
   if(sim) {
-    if(is.null(tFunction)) {
+    if(base::is.null(tFunction)) {
       stop("Transition function is not supplied. Please define.")
     }
 
@@ -208,7 +208,7 @@ getFirstTransition <- function(state, action, sim = FALSE, tFunction = NULL, tra
       # get a random previous state that happens by going right. Double check that it
       # has an "R" with str_detect and if not, keep doing a random previously visited one
       # until it gets one with an "R". Then set next_state as tempState (whatever has the "R").
-      if(sum(is.na(trans$Table)) == 5) {
+      if(base::sum(base::is.na(trans$Table)) == 5) {
 
         #get random previous state.
         tempState <- randomPrevious(transDF, "State2")
@@ -222,16 +222,16 @@ getFirstTransition <- function(state, action, sim = FALSE, tFunction = NULL, tra
         #test to make sure we've experienced both states. If so, use the transition probability.
       }else if ("RB" %in% transDF$State2 & "RA" %in% transDF$State2) {
         if (p1 <= rightProb) {
-          next_state <- state("RB")
+          next_state <- "RB"
         } else if(p1 > rightProb) {
-          next_state <- state("RA")
+          next_state <- "RA"
         }
         #if not, then just assign the next state as the previously observed one.
       } else if ("RB" %in% transDF$State2 & !"RA" %in% transDF$State2) {
-        next_state <- state("RB")
+        next_state <- "RB"
         #if not, then just assign the next state as the previously observed one.
       }else if (!"RB" %in% transDF$State2 & "RA" %in% transDF$State2) {
-        next_state <- state("RA")
+        next_state <- "RA"
       }
       #similarly, if the action is left
     } else if (action == "left"){
@@ -253,16 +253,16 @@ getFirstTransition <- function(state, action, sim = FALSE, tFunction = NULL, tra
         #test to make sure we've experienced both possible states. If so, use transition probability.
       }else if("LB" %in% transDF$State2 & "LA" %in% transDF$State2) {
         if(p1 <= leftProb){
-          next_state <- state("LA")
+          next_state <- "LA"
         }else if (p1 > leftProb) {
-          next_state <- state("LB")
+          next_state <- "LB"
         }
         #if not, then just assign the next state as the previously observed one.
       }else if ("LB" %in% transDF$State2 & !"LA" %in% transDF$State2) {
-        next_state <- state("LB")
+        next_state <- "LB"
         #if not, then just assign the next state as the previously observed one.
       }else if (!"LB" %in% transDF$State2 & "LA" %in% transDF$State2) {
-        next_state <- state("LA")
+        next_state <- "LA"
       }
 
     }
@@ -287,31 +287,31 @@ getFirstTransition <- function(state, action, sim = FALSE, tFunction = NULL, tra
 getSecondTransition <- function(state, action) {
 
   #get next state if in state 1
-  if (state == state("RA") && action == "right") {
-    state <- state("RAR")
+  if (state == "RA" && action == "right") {
+    state <- "RAR"
     reward <- getReward(state = "RAR")}
-  if (state == state("RA") && action == "left") {
-    state <- state("RAL")
+  if (state == "RA" && action == "left") {
+    state <- "RAL"
     reward <- getReward(state = "RAL")}
-  if (state == state("LA") && action == "right") {
-    state <- state("LAR")
+  if (state == "LA" && action == "right") {
+    state <- "LAR"
     reward <- getReward(state = "LAR")}
-  if (state == state("LA") && action == "left") {
-    state <- state("LAL")
+  if (state == "LA" && action == "left") {
+    state <- "LAL"
     reward <- getReward(state = "LAL")}
 
   #get next state if in state 2
-  if (state == state("RB") && action == "right") {
-    state <- state("RBR")
+  if (state == "RB" && action == "right") {
+    state <- "RBR"
     reward <- getReward(state = "RBR")}
-  if (state == state("RB") && action == "left") {
-    state <- state("RBL")
+  if (state == "RB" && action == "left") {
+    state <- "RBL"
     reward <- getReward(state = "RBL")}
-  if (state == state("LB") && action == "right") {
-    state <- state("LBR")
+  if (state == "LB" && action == "right") {
+    state <- "LBR"
     reward <- getReward(state = "LBR")}
-  if (state == state("LB") && action == "left") {
-    state <- state("LBL")
+  if (state == "LB" && action == "left") {
+    state <- "LBL"
     reward <- getReward(state = "LBL")}
 
   output <- data.frame(state = state,

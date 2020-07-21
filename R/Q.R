@@ -1,6 +1,17 @@
 # setupQtable function ----------------------------------------------------
 # setupQtable function simply initializes the Qtable for the beginning of a session.
 
+#' Initialize Q-value Information
+#'
+#' setupQtable initializes the \code{Q$Table}, including the \code{Q$R} and
+#' \code{Q$L} values, plus the comparison vectors used to update Q-values in the
+#' \code{\link{updateQsecondState}} and \code{\link{updateQthirdState}} functions.
+#'
+#' @return \code{Q$Table}, \code{Q$R}, \code{Q$L}, and two vectors used in the
+#' \code{\link{updateQsecondState}} and \code{\link{updateQthirdState}} functions.
+#' @export
+#'
+
 setupQtable <- function() {
 
   #initialize Qtable as zeros.
@@ -25,8 +36,6 @@ setupQtable <- function() {
 
 }
 
-
-
 #' Update QR and QL
 #'
 #' The \code{updateQRL} function will take in the action an agent performs and
@@ -45,11 +54,11 @@ updateQRL <- function(state, action, alpha, gamma) {
 
   if (state == "FC" && action == "right") {
     #update the Q value of going right at state FC
-    Q$R <- Q$R + (alpha * (0 + (gamma * base::max(Q$Table[1:4,1]) - QR)))
+    Q$R <- Q$R + (alpha * (0 + (gamma * base::max(Q$Table[1:4,1]) - Q$R)))
 
   }else if (state == "FC" && action == "left") {
     #update the Q value of going left at state FC
-    Q$L <- Q$L + (alpha * (0 + (gamma * base::max(Q$Table[5:8,1]) - QL)))
+    Q$L <- Q$L + (alpha * (0 + (gamma * base::max(Q$Table[5:8,1]) - Q$L)))
   }
 
 }
@@ -79,9 +88,6 @@ updateQsecondState <- function(state, action, alpha, gamma) {
   Q$Table[index,1] <- Q$Table[index,1] + (alpha * (0 + (gamma * base::max(Q$Table[index,2])) - Q$Table[index,1]))
 
 }
-
-
-
 
 #' Update Q-values at Third State
 #'

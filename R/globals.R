@@ -1,1 +1,1 @@
-utils::globalVariables(c("%>%", "transTable"))
+utils::globalVariables(c("%>%", "transTable", "."))
