@@ -22,4 +22,8 @@ Imports:
     tidyr,
     rlang,
     tidyselect,
-    scales
+    scales,
+    tidymodels,
+    workflows,
+    parsnip,
+    recipes
