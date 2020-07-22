@@ -19,4 +19,7 @@ Imports:
     forcats,
     purrr,
     ggplot2,
-    tidyr
+    tidyr,
+    rlang,
+    tidyselect,
+    scales
